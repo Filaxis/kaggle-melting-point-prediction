@@ -162,7 +162,9 @@ Key takeaways include:
 
 To reproduce the full pipeline:
 
+```bash
 make all
 python -m experiments.exp_ensemble
+```
 
 This generates a Kaggle-compatible submission file.
