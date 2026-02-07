@@ -1,0 +1,21 @@
+# Python version constraint:
+# This project requires Python <= 3.11.9 due to RDKit compatibility.
+# RDKit depends on NumPy/Pandas wheels that are not available for Python >= 3.12.
+
+python<=3.11.9
+
+# Core scientific stack
+numpy==1.26.4
+pandas==2.1.4
+scipy==1.11.4
+
+# Chemistry
+rdkit==2023.09.6
+
+# Machine learning
+scikit-learn==1.8.0
+xgboost==2.0.3
+
+# Utilities
+joblib>=1.3
+tqdm>=4.66
