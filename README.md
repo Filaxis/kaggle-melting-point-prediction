@@ -148,15 +148,30 @@ documentation/experiment_results.xlsx
 
 ## 9. Discussion and Lessons Learned
 
-Several alternative setups were explored, including:
-- baseline models without scaffold grouping
-- descriptor-only and fingerprint-only models
-- different external data weighting schemes
+Several modeling setups were explored during the course of this project:
 
-Key takeaways include:
-- Scaffold-aware validation is critical in chemistry ML
-- Data preprocessing and validation strategy often matter more than model choice
-- Refactoring notebooks into scripts improves reproducibility and clarity
+- **Descriptor + NMF baseline**, using 8 RDKit molecular descriptors combined with 50 NMF-reduced molecular group features.
+- **Extended descriptor + NMF model**, using 18 molecular descriptors with the same NMF representation. This configuration highlighted the sensitivity of unsupervised feature extraction to preprocessing order and reinforced the need for strict separation between training and validation data.
+- **Fingerprint-based model**, replacing NMF-reduced group features with 512-bit Morgan fingerprints (radius = 2) and a reduced set of molecular descriptors.
+- **Fingerprint + external data model (final)**, where the Kaggle training data was merged with a deduplicated external dataset to increase chemical diversity, with external samples down-weighted during training.
+
+A detailed comparison of public and private leaderboard MAE values for all tested configurations is provided in `documentation/experiment_results.xlsx`.
+
+When transitioning from NMF-reduced group features to Morgan fingerprints, the molecular descriptor set was intentionally reduced from 18 to 8 features. Many of the removed descriptors (e.g. ExactMolWt, HeavyAtomCount, MolMR, LabuteASA, BertzCT, BalabanJ, and partial charge extrema) are strongly correlated with molecular size or connectivity patterns already captured by the fingerprint representation. Retaining only a compact, chemically interpretable descriptor set helped reduce redundancy and model variance without sacrificing predictive signal.
+
+Key lessons learned include:
+
+- **Feature representation dominates model choice**: replacing NMF-reduced group features with Morgan fingerprints had a larger impact than subsequent hyperparameter tuning.
+- **Descriptor redundancy matters**: combining high-dimensional fingerprints with a large number of correlated global descriptors can degrade performance; chemistry-driven pruning improves robustness.
+- **Validation strategy is critical in chemistry ML**: scaffold-aware cross-validation provides a more realistic performance estimate, even when it does not immediately translate into public leaderboard gains.
+- **External data can improve generalization**, but only when combined with deduplication, scaffold awareness, and appropriate sample weighting.
+- **Refactoring notebooks into modular scripts improves reliability**: migrating from a monolithic Kaggle notebook to a structured pipeline made hidden assumptions explicit and improved reproducibility.
+
+Leaderboard selection note
+
+- The code in this repository corresponds to the **best-performing configuration on the private leaderboard**, which used an extended, deduplicated external dataset and scaffold-aware validation.
+- Due to Kaggle’s automatic submission selection based on the public leaderboard, a different submission (trained on Kaggle-only data) was selected, reaching the official competition rank **479 / 1177**.
+- Had the external-data submission been selected, the final rank would have been approximately **320 / 1177**.
 
 ## 10. Reproducibility
 
